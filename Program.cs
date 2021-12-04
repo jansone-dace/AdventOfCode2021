@@ -129,12 +129,66 @@ namespace AdventOfCode2021
             return horizontalPosition * depth;
         }
 
+        static int Day3_1()
+        {
+            string[] inputBinaryNumbers;
+            string gammaRate = "", epsilonRate = "";
+            int zeroCount, onesCount;
+
+            // Read binary numbers from input file 
+            inputBinaryNumbers = File.ReadAllLines(@".\inputs\day3.txt");
+
+            // Each bit in the gamma rate can be determined by finding the most common bit 
+            // in the corresponding position of all numbers in the diagnostic report.
+
+            // (we assume correct input for everything, but in this puzzle there are many things that could be checked)
+
+            // First read by columns 
+            for (int column = 0; column < inputBinaryNumbers[0].Length; column++)
+            {
+                // Start new count
+                zeroCount = onesCount = 0;
+
+                // Then read by rows
+                for (int row = 0; row < inputBinaryNumbers.Length; row++)
+                {
+                    // Count how many zeros and ones are in each column
+                    if (inputBinaryNumbers[row][column] == '0')
+                        zeroCount++;
+                    else
+                        onesCount++;
+                }
+
+                // See which bit was most common and build gamma rate
+                if (zeroCount > onesCount)
+                    gammaRate += "0";
+                else
+                    gammaRate += "1";
+            }
+
+            // The epsilon rate is calculated in a similar way; rather than use the most common bit, 
+            // the least common bit from each position is used.
+
+            // Invert gamma rate to get the epsilon rate
+            for (int i = 0; i < gammaRate.Length; i++)
+            {
+                if (gammaRate[i] == '0')
+                    epsilonRate += "1";
+                else
+                    epsilonRate += "0";
+            }
+
+            // Multiply decimal values of gamma rate and epsilon rate and return the value
+            return Convert.ToInt32(gammaRate, 2) * Convert.ToInt32(epsilonRate, 2);
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
             Console.WriteLine(String.Format("Day 1 part 2: {0}", Day1_2()));
             Console.WriteLine(string.Format("Day 2 part 1: {0}", Day2_1()));
             Console.WriteLine(string.Format("Day 2 part 2: {0}", Day2_2()));
+            Console.WriteLine(string.Format("Day 3 part 1: {0}", Day3_1()));
         }
     }
 }
