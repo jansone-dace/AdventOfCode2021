@@ -48,10 +48,50 @@ namespace AdventOfCode2021
             return increaseCount;
         }
 
+        static int Day2_1()
+        {
+            string[] commands;
+            string commandType;
+            int horizontalPosition = 0, verticalPosition = 0, commandNumericalValue;
+
+            // Read commands from input file 
+            commands = File.ReadAllLines(@".\inputs\day2.txt");
+
+            // Iterate through each command
+            foreach (string command in commands)
+            {
+                // From each command get the command type and numerical value
+                commandType = command.Split(' ')[0];
+                commandNumericalValue = Int32.Parse(command.Split(' ')[1]);
+
+                switch (commandType)
+                {
+                    case "up":
+                        // up X decreases the depth by X units
+                        verticalPosition -= commandNumericalValue;
+                        break;
+                    case "down":
+                        // down X increases the depth by X units
+                        verticalPosition += commandNumericalValue;
+                        break;
+                    case "forward":
+                        // forward X increases the horizontal position by X units
+                        horizontalPosition += commandNumericalValue;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            // Multiply horizontal and vertical positions and return it as a result
+            return horizontalPosition * verticalPosition;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
             Console.WriteLine(String.Format("Day 1 part 2: {0}", Day1_2()));
+            Console.WriteLine(string.Format("Day 2 part 1: {0}", Day2_1()));
         }
     }
 }
