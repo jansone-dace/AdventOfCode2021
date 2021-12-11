@@ -182,6 +182,113 @@ namespace AdventOfCode2021
             return Convert.ToInt32(gammaRate, 2) * Convert.ToInt32(epsilonRate, 2);
         }
 
+        static int Day3_2()
+        {
+            string[] inputBinaryNumbers;
+            List<string> oxygenBinaryNumbers, scrubberBinaryNumbers;
+            int zeroCount, onesCount;
+
+            // Read binary numbers from input file into both lists
+            oxygenBinaryNumbers = scrubberBinaryNumbers = File.ReadAllLines(@".\inputs\day3.txt").ToList();
+
+            // - Keep only numbers selected by the bit criteria for the type of rating value for which you are searching. 
+            //   Discard numbers which do not match the bit criteria.
+            // - If you only have one number left, stop; this is the rating value for which you are searching.
+            // - Otherwise, repeat the process, considering the next bit to the right.
+
+            // - To find oxygen generator rating, determine the most common value (0 or 1) in the current bit position, 
+            //   and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 1 in the position being considered.
+            // - To find CO2 scrubber rating, determine the least common value (0 or 1) in the current bit position, 
+            //   and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 0 in the position being considered.
+
+
+            // First - find oxygen generator rating
+            // Start reading input by columns from left
+            // TODO: make it a function
+            while (oxygenBinaryNumbers.Count > 1)
+            {
+                for (int column = 0; column < oxygenBinaryNumbers[0].Length; column++)
+                {
+                    // Start new count
+                    zeroCount = onesCount = 0;
+
+                    // Then read one digit from each row
+                    for (int row = 0; row < oxygenBinaryNumbers.Count; row++)
+                    {
+                        // Count how many zeros and ones are in each column
+                        if (oxygenBinaryNumbers[row][column] == '0')
+                            zeroCount++;
+                        else
+                            onesCount++;
+                    }
+
+                    // See which bit was most and least common and filter the list
+                    if (onesCount > zeroCount)
+                    {
+                        // If there are more 1s than 0s, then for oxygen generator rating keep all the numbers with 1 in current position
+                        if (oxygenBinaryNumbers.Count > 1)
+                            oxygenBinaryNumbers = oxygenBinaryNumbers.Where(val => val[column] == '1').ToList();
+                    }
+                    else if (onesCount < zeroCount)
+                    {
+                        // If there are more 0s than 1s, then for oxygen generator rating keep all the numbers with 0 in current position
+                        if (oxygenBinaryNumbers.Count > 1)
+                            oxygenBinaryNumbers = oxygenBinaryNumbers.Where(val => val[column] == '0').ToList();
+                    }
+                    else
+                    {
+                        // If there are equal amount of 1s and 0s, then for oxygen generator rating keep all the number with 1 in current postion
+                        if (oxygenBinaryNumbers.Count > 1)
+                            oxygenBinaryNumbers = oxygenBinaryNumbers.Where(val => val[column] == '1').ToList();
+                    }
+                }
+            }
+
+            // Then find the CO2 scrubber rating
+            // Start reading input by columns from left
+            while (scrubberBinaryNumbers.Count > 1)
+            {
+                for (int column = 0; column < scrubberBinaryNumbers[0].Length; column++)
+                {
+                    // Start new count
+                    zeroCount = onesCount = 0;
+
+                    // Then read one digit from each row
+                    for (int row = 0; row < scrubberBinaryNumbers.Count; row++)
+                    {
+                        // Count how many zeros and ones are in each column
+                        if (scrubberBinaryNumbers[row][column] == '0')
+                            zeroCount++;
+                        else
+                            onesCount++;
+                    }
+
+                    // See which bit was most and least common and filter the list
+                    if (onesCount > zeroCount)
+                    {
+                        // If there are more 1s than 0s, then for CO2 scrubber rating keep all the numbers with 0 in current position
+                        if (scrubberBinaryNumbers.Count > 1)
+                            scrubberBinaryNumbers = scrubberBinaryNumbers.Where(val => val[column] == '0').ToList();
+                    }
+                    else if (onesCount < zeroCount)
+                    {
+                        // If there are more 0s than 1s, then for CO2 scrubber rating keep all the numbers with 1 in current position
+                        if (scrubberBinaryNumbers.Count > 1)
+                            scrubberBinaryNumbers = scrubberBinaryNumbers.Where(val => val[column] == '1').ToList();
+                    }
+                    else
+                    {
+                        // If there are equal amount of 1s and 0s, then for CO2 scrubber rating keep all the numbers with 0 in current position
+                        if (scrubberBinaryNumbers.Count > 1)
+                            scrubberBinaryNumbers = scrubberBinaryNumbers.Where(val => val[column] == '0').ToList();
+                    }
+                }
+            }
+
+            // Finally, to find the life support rating, multiply the oxygen generator rating (decimal) by the CO2 scrubber rating (decimal)
+            return Convert.ToInt32(oxygenBinaryNumbers[0], 2) * Convert.ToInt32(scrubberBinaryNumbers[0], 2);
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
@@ -189,6 +296,7 @@ namespace AdventOfCode2021
             Console.WriteLine(string.Format("Day 2 part 1: {0}", Day2_1()));
             Console.WriteLine(string.Format("Day 2 part 2: {0}", Day2_2()));
             Console.WriteLine(string.Format("Day 3 part 1: {0}", Day3_1()));
+            Console.WriteLine(string.Format("Day 3 part 2: {0}", Day3_2()));
         }
     }
 }
