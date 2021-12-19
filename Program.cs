@@ -289,6 +289,98 @@ namespace AdventOfCode2021
             return Convert.ToInt32(oxygenBinaryNumbers[0], 2) * Convert.ToInt32(scrubberBinaryNumbers[0], 2);
         }
 
+        static int Day4_1()
+        {
+            string[] bingoNumbers, columnValues;
+            List<List<string>> boards = new List<List<string>>();
+            List<string> boardValues;
+            int columnStartIndex, rowStartIndex, sumOfUnmarkedNumbers;
+
+            void addBoardValues(ref List<string> board, string numberLine)
+            {
+                // Get values for current column
+                columnValues = numberLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                // Add values to the board
+                board.Add(columnValues[0]);
+                board.Add(columnValues[1]);
+                board.Add(columnValues[2]);
+                board.Add(columnValues[3]);
+                board.Add(columnValues[4]);
+            }
+            
+            // Read input file line by line
+            var lines = File.ReadLines(@".\inputs\day4.txt").ToList();
+            // First line is bingo numbers
+            bingoNumbers = lines[0].Split(',');
+
+            // Start with index 2 because 0 was bingo numbers and 1 is empty line
+            // i+=6, because 5 rows for board and then one empty line
+            for (int i = 2; i < lines.Count; i += 6)
+            {
+                // Create new board and fill with values
+                 boardValues = new List<string>();
+
+                
+                addBoardValues(ref boardValues, lines[i]); // Column 1
+                addBoardValues(ref boardValues, lines[i+1]); // Column 2
+                addBoardValues(ref boardValues, lines[i+2]); // Column 3
+                addBoardValues(ref boardValues, lines[i+3]); // Column 4
+                addBoardValues(ref boardValues, lines[i+4]); // Column 5
+
+                // Add board to the boards list
+                boards.Add(boardValues);
+            }
+
+            // Now go through every bingo number
+            foreach (var number in bingoNumbers)
+            {
+                // Look for that number in boards
+                foreach (var board in boards)
+                {
+                    for (int field = 0; field < board.Count; field++)
+                    {
+                        // When found
+                        if (board[field] == number)
+                        {
+                            // mark that field
+                            board[field] = "*";
+
+                            // see if this board has a bingo (look only at the column and row of marked field)
+                            // find start index for current column and row
+                            columnStartIndex = field - (field % 5);
+                            rowStartIndex = field % 5;
+                            
+                            // look for a bingo
+                            if ((board[columnStartIndex] == "*"
+                                 && board[columnStartIndex+1] == "*"
+                                 && board[columnStartIndex+2] == "*"
+                                 && board[columnStartIndex+3] == "*"
+                                 && board[columnStartIndex+4] == "*")
+                            || (board[rowStartIndex] == "*"
+                                && board[rowStartIndex+5] == "*"
+                                && board[rowStartIndex+10] == "*"
+                                && board[rowStartIndex+15] == "*"
+                                && board[rowStartIndex+20] == "*"))
+                            {
+                                // Find sum of all unmarked numbers from winning board
+                                sumOfUnmarkedNumbers = 0;
+                                foreach (var boardNumber in board)
+                                {
+                                    if (boardNumber != "*")
+                                        sumOfUnmarkedNumbers += Int32.Parse(boardNumber);
+                                }
+
+                                // Return the score - sum of all unmarked numbers mulitplied by last drawn number
+                                return sumOfUnmarkedNumbers * Int32.Parse(number);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return 0;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
@@ -297,6 +389,7 @@ namespace AdventOfCode2021
             Console.WriteLine(string.Format("Day 2 part 2: {0}", Day2_2()));
             Console.WriteLine(string.Format("Day 3 part 1: {0}", Day3_1()));
             Console.WriteLine(string.Format("Day 3 part 2: {0}", Day3_2()));
+            Console.WriteLine(string.Format("Day 4 part 1: {0}", Day4_1()));
         }
     }
 }
