@@ -1,7 +1,91 @@
 ﻿using System.IO;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2021
 {
+    class Point
+    {
+        public Point(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        // These two functions are for element comparison in list
+        public override bool Equals(object obj)
+        {
+            if (!(obj is Point))
+                return false;
+            Point p = (Point)obj;
+            return (p.X == X && p.Y == Y);
+        }
+
+        public override int GetHashCode()
+        {
+            return String.Format("{0},{1}", X, Y).GetHashCode();
+        }
+    }
+
+    class Line
+    {
+        public Line(int fromX, int fromY, int toX, int toY)
+        {
+            from = new Point(fromX, fromY);
+            to = new Point(toX, toY);
+        }
+
+        public Point from { get; set; }
+        public Point to { get; set; }
+
+        public bool IsHorizontalOrVertical()
+        {
+            return from.X == to.X || from.Y == to.Y;
+        }
+
+        public List<Point> GetPoints()
+        {
+            List<Point> result = new List<Point>();
+            Point currentPoint;
+            int directionX, directionY, currentX, currentY;
+
+            if (from.X == to.X)
+                directionX = 0;
+            else if (from.X < to.X)
+                directionX = 1;
+            else
+                directionX = -1;
+            
+            if (from.Y == to.Y)
+                directionY = 0;
+            else if (from.Y < to.Y)
+                directionY = 1;
+            else
+                directionY = -1;
+
+            currentX = from.X;
+            currentY = from.Y;
+
+            while (currentX != to.X || currentY != to.Y)
+            {
+                // Add point to the list
+                currentPoint = new Point(currentX, currentY);
+                result.Add(currentPoint);
+                
+                // Look for next point
+                currentX += directionX;
+                currentY += directionY;
+            }
+
+            // Add final point to the list
+            result.Add(to);
+
+            return result;
+        }
+    }
+
     class Program
     {
         static int Day1_1()
@@ -482,6 +566,58 @@ namespace AdventOfCode2021
             return 0;
         }
 
+        static int Day5_1()
+        {
+            int fromX, fromY, toX, toY;
+            Match coordinatesMatch;
+            Line hydrothermalVentLine;
+            List<Line> hydrothermalVentLineList = new List<Line>();
+            List<Point> line1Points, line2Points;
+            // Use set for intersection points so there are only unique points
+            HashSet<Point> intersectionPoints = new HashSet<Point>();
+
+            // Read input file line by line
+            var inputLines = File.ReadLines(@".\inputs\day5.txt").ToList();
+            foreach (var line in inputLines)
+            {
+                // Get all the coordinates from line
+                coordinatesMatch = Regex.Match(line, @"(?<fromX>[0-9]+),(?<fromY>[0-9]+)\s\->\s(?<toX>[0-9]+),(?<toY>[0-9]+)");
+                fromX = Int32.Parse(coordinatesMatch.Groups["fromX"].Value);
+                fromY = Int32.Parse(coordinatesMatch.Groups["fromY"].Value);
+                toX = Int32.Parse(coordinatesMatch.Groups["toX"].Value);
+                toY = Int32.Parse(coordinatesMatch.Groups["toY"].Value);
+
+                hydrothermalVentLine = new Line(fromX, fromY, toX, toY);
+
+                // For now, we only consider horizontal and vertical lines
+                // So only add horizontal or vertical lines to the line list
+                if (hydrothermalVentLine.IsHorizontalOrVertical())
+                {
+                    hydrothermalVentLineList.Add(hydrothermalVentLine);
+                }
+            }
+
+            // Compare each line with each line to find their intersection points
+            for (int i = 0; i < hydrothermalVentLineList.Count; i++)
+            {
+                for (int j = i+1; j < hydrothermalVentLineList.Count; j++)
+                {
+                    // Get list of points for each line
+                    line1Points = hydrothermalVentLineList.ElementAt(i).GetPoints();
+                    line2Points = hydrothermalVentLineList.ElementAt(j).GetPoints();
+
+                    // Look for points that are the same
+                    // TODO: use hashsets instead
+                    List<Point> intersections = line1Points.Intersect(line2Points).ToList();
+
+                    // Add found points to the result set
+                    intersectionPoints.UnionWith(intersections);
+                }
+            }
+
+            return intersectionPoints.Count;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
@@ -492,6 +628,7 @@ namespace AdventOfCode2021
             Console.WriteLine(string.Format("Day 3 part 2: {0}", Day3_2()));
             Console.WriteLine(string.Format("Day 4 part 1: {0}", Day4_1()));
             Console.WriteLine(string.Format("Day 4 part 2: {0}", Day4_2()));
+            Console.WriteLine(string.Format("Day 5 part 1: {0}", Day5_1()));
         }
     }
 }
