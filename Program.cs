@@ -572,7 +572,7 @@ namespace AdventOfCode2021
             Match coordinatesMatch;
             Line hydrothermalVentLine;
             List<Line> hydrothermalVentLineList = new List<Line>();
-            List<Point> line1Points, line2Points;
+            List<Point> line1Points, line2Points, lineIntersections;
             // Use set for intersection points so there are only unique points
             HashSet<Point> intersectionPoints = new HashSet<Point>();
 
@@ -607,11 +607,57 @@ namespace AdventOfCode2021
                     line2Points = hydrothermalVentLineList.ElementAt(j).GetPoints();
 
                     // Look for points that are the same
-                    // TODO: use hashsets instead
-                    List<Point> intersections = line1Points.Intersect(line2Points).ToList();
+                    lineIntersections = line1Points.Intersect(line2Points).ToList();
 
                     // Add found points to the result set
-                    intersectionPoints.UnionWith(intersections);
+                    intersectionPoints.UnionWith(lineIntersections);
+                }
+            }
+
+            return intersectionPoints.Count;
+        }
+
+        static int Day5_2()
+        {
+            int fromX, fromY, toX, toY;
+            Match coordinatesMatch;
+            Line hydrothermalVentLine;
+            List<Line> hydrothermalVentLineList = new List<Line>();
+            List<Point> line1Points, line2Points, lineIntersections;
+            // Use set for intersection points so there are only unique points
+            HashSet<Point> intersectionPoints = new HashSet<Point>();
+
+            // Read input file line by line
+            var inputLines = File.ReadLines(@".\inputs\day5.txt").ToList();
+            foreach (var line in inputLines)
+            {
+                // Get all the coordinates from line
+                coordinatesMatch = Regex.Match(line, @"(?<fromX>[0-9]+),(?<fromY>[0-9]+)\s\->\s(?<toX>[0-9]+),(?<toY>[0-9]+)");
+                fromX = Int32.Parse(coordinatesMatch.Groups["fromX"].Value);
+                fromY = Int32.Parse(coordinatesMatch.Groups["fromY"].Value);
+                toX = Int32.Parse(coordinatesMatch.Groups["toX"].Value);
+                toY = Int32.Parse(coordinatesMatch.Groups["toY"].Value);
+
+                hydrothermalVentLine = new Line(fromX, fromY, toX, toY);
+
+                // Add line to the line list
+                hydrothermalVentLineList.Add(hydrothermalVentLine);
+            }
+
+            // Compare each line with each line to find their intersection points
+            for (int i = 0; i < hydrothermalVentLineList.Count; i++)
+            {
+                for (int j = i+1; j < hydrothermalVentLineList.Count; j++)
+                {
+                    // Get list of points for each line
+                    line1Points = hydrothermalVentLineList.ElementAt(i).GetPoints();
+                    line2Points = hydrothermalVentLineList.ElementAt(j).GetPoints();
+
+                    // Look for points that are the same
+                    lineIntersections = line1Points.Intersect(line2Points).ToList();
+
+                    // Add found points to the result set
+                    intersectionPoints.UnionWith(lineIntersections);
                 }
             }
 
@@ -629,6 +675,7 @@ namespace AdventOfCode2021
             Console.WriteLine(string.Format("Day 4 part 1: {0}", Day4_1()));
             Console.WriteLine(string.Format("Day 4 part 2: {0}", Day4_2()));
             Console.WriteLine(string.Format("Day 5 part 1: {0}", Day5_1()));
+            Console.WriteLine(string.Format("Day 5 part 2: {0}", Day5_2()));
         }
     }
 }
