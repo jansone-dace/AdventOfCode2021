@@ -664,6 +664,45 @@ namespace AdventOfCode2021
             return intersectionPoints.Count;
         }
 
+        static int Day6_1()
+        {
+            const int TOTAL_DAYS = 80; // for this puzzle we look at how many lanternfish will be after 80 days
+            const int RESET_TIMER_GROWNUP_FISH = 6; // for grown-up fishes reset timer is 6
+            const int RESET_TIMER_BABY_FISH = 8; // for new baby fish reset timer is 8
+            List<int> lanterfishTimers;
+            int newLanternfishCount;
+
+            // Read input
+            string input = File.ReadAllText(@".\inputs\day6.txt");
+            lanterfishTimers = input.Split(',').Select(Int32.Parse).ToList();
+
+            for (int day = 0; day < TOTAL_DAYS; day++)
+            {
+                // Each day each lanternfish timer decreses by 1
+                // After 0 timer resets to 6 and births new lanternfish with timer 8
+                newLanternfishCount = 0;
+                for (int fishIndex = 0; fishIndex < lanterfishTimers.Count; fishIndex++)
+                {
+                    if (lanterfishTimers[fishIndex] == 0)
+                    {
+                        lanterfishTimers[fishIndex] = RESET_TIMER_GROWNUP_FISH;
+                        newLanternfishCount++;
+                    }
+                    else
+                        lanterfishTimers[fishIndex]--;
+                }
+
+                // At the end add new fishes
+                for (int newFish = 0; newFish < newLanternfishCount; newFish++)
+                {
+                    lanterfishTimers.Add(RESET_TIMER_BABY_FISH);
+                }
+            }
+
+            // Return how many lanternfishes we have
+            return lanterfishTimers.Count;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
@@ -674,8 +713,9 @@ namespace AdventOfCode2021
             Console.WriteLine(string.Format("Day 3 part 2: {0}", Day3_2()));
             Console.WriteLine(string.Format("Day 4 part 1: {0}", Day4_1()));
             Console.WriteLine(string.Format("Day 4 part 2: {0}", Day4_2()));
-            Console.WriteLine(string.Format("Day 5 part 1: {0}", Day5_1()));
-            Console.WriteLine(string.Format("Day 5 part 2: {0}", Day5_2()));
+            //Console.WriteLine(string.Format("Day 5 part 1: {0}", Day5_1())); // commented out because it is very slow
+            //Console.WriteLine(string.Format("Day 5 part 2: {0}", Day5_2())); // commented out because it is very slow
+            Console.WriteLine(string.Format("Day 6 part 1: {0}", Day6_1()));
         }
     }
 }
