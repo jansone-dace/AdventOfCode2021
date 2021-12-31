@@ -732,6 +732,59 @@ namespace AdventOfCode2021
             return minimumFuel;
         }
 
+        static int Day7_2()
+        {
+            List<int> crabPositions;
+            int minPosition, maxPosition, fuelSum, minimumFuel = -1;
+            // Store how much it costs to make specific amount of steps (initialize for step 1)
+            Dictionary<int,int> stepCost = new Dictionary<int, int>(){ {1,1} };
+
+            int GetStepCost(int stepCount)
+            {
+                int cost;
+                
+                if (stepCount <= 0)
+                    return 0;
+
+                // See if dictionary has value for that amount of steps
+                if (stepCost.ContainsKey(stepCount))
+                    return stepCost[stepCount];
+                
+                // Otherwise look for the cost recursively (go down)
+                cost = stepCount + GetStepCost(stepCount-1);
+
+                // Save the found cost to dictionary
+                stepCost.Add(stepCount, cost);
+
+                // And return value
+                return cost;
+            }
+
+            // Read input
+            string input = File.ReadAllText(@".\inputs\day7.txt");
+            crabPositions = input.Split(',').Select(Int32.Parse).ToList();
+
+            // Find minimum and maximum position (we will look at any position between those)
+            minPosition = crabPositions.Min();
+            maxPosition = crabPositions.Max();
+
+            // Go through every possible position between minum and maximum
+            // TODO: something better than brute-force?
+            for (int position = minPosition; position <= maxPosition; position++)
+            {
+                // Find the sum of total fuel for this position
+                fuelSum = 0;
+                foreach (var crabPosition in crabPositions)
+                    fuelSum += GetStepCost(Math.Abs(crabPosition-position));
+                
+                // Check if current positions fuel is less than previously know minimum
+                if (minimumFuel == -1 || fuelSum < minimumFuel)
+                    minimumFuel = fuelSum;
+            }
+
+            return minimumFuel;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
@@ -747,6 +800,7 @@ namespace AdventOfCode2021
             Console.WriteLine(string.Format("Day 6 part 1: {0}", Day6_1()));
             //Console.WriteLine(string.Format("Day 6 part 2: {0}", Day6_2())); // TODO
             Console.WriteLine(string.Format("Day 7 part 1: {0}", Day7_1()));
+            Console.WriteLine(string.Format("Day 7 part 2: {0}", Day7_2()));
         }
     }
 }
