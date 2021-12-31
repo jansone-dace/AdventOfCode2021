@@ -703,6 +703,35 @@ namespace AdventOfCode2021
             return lanterfishTimers.Count;
         }
 
+        static int Day7_1()
+        {
+            List<int> crabPositions;
+            int minPosition, maxPosition, fuelSum, minimumFuel = -1;
+
+            // Read input
+            string input = File.ReadAllText(@".\inputs\day7.txt");
+            crabPositions = input.Split(',').Select(Int32.Parse).ToList();
+
+            // Find minimum and maximum position (we will look at any position between those)
+            minPosition = crabPositions.Min();
+            maxPosition = crabPositions.Max();
+
+            // Go through every possible position between minum and maximum
+            for (int position = minPosition; position <= maxPosition; position++)
+            {
+                // Find the sum of total fuel for this position
+                fuelSum = 0;
+                foreach (var crabPosition in crabPositions)
+                    fuelSum += Math.Abs(crabPosition - position);
+                
+                // Check if current positions fuel is less than previously know minimum
+                if (minimumFuel == -1 || fuelSum < minimumFuel)
+                    minimumFuel = fuelSum;
+            }
+
+            return minimumFuel;
+        }
+
         static void Main(string[] args)
         {
             Console.WriteLine(String.Format("Day 1 part 1: {0}", Day1_1()));
@@ -716,6 +745,8 @@ namespace AdventOfCode2021
             //Console.WriteLine(string.Format("Day 5 part 1: {0}", Day5_1())); // commented out because it is very slow
             //Console.WriteLine(string.Format("Day 5 part 2: {0}", Day5_2())); // commented out because it is very slow
             Console.WriteLine(string.Format("Day 6 part 1: {0}", Day6_1()));
+            //Console.WriteLine(string.Format("Day 6 part 2: {0}", Day6_2())); // TODO
+            Console.WriteLine(string.Format("Day 7 part 1: {0}", Day7_1()));
         }
     }
 }
